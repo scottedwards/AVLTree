@@ -1,13 +1,16 @@
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Stack;
 
 import static java.lang.Math.abs;
 
-public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
+public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
 
-    private Node<T> root;
+    private Node<E> root;
     private Integer size;
 
     AvlTree() {
@@ -16,7 +19,7 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
     }
 
     @Override
-    public void insert(T value) {
+    public void insert(E value) {
         Objects.requireNonNull(value, "You cannot enter null as a value!");
         if (root == null) {
             root = new Node<>(value);
@@ -27,15 +30,15 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
     }
 
     @Override
-    public void insertAll(List<T> values) {
-        for (T value: values) {
+    public void insertAll(List<E> values) {
+        for (E value: values) {
             insert(value);
         }
     }
 
-    private Direction insertIntoSubtree(Node<T> parent, T value) {
+    private Direction insertIntoSubtree(Node<E> parent, E value) {
         Direction direction = (parent.getValue().compareTo(value) <= 0) ? Direction.RIGHT : Direction.LEFT;
-        Optional<Node<T>> wantedChild = parent.get(direction);
+        Optional<Node<E>> wantedChild = parent.get(direction);
         if (wantedChild.isPresent()) {
             Direction childDirection = insertIntoSubtree(wantedChild.get(), value);
             Integer balance = balanceOf(parent);
@@ -49,7 +52,7 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
         return direction;
     }
 
-    private void rotate(Node<T> node, Direction dir1, Direction dir2) {
+    private void rotate(Node<E> node, Direction dir1, Direction dir2) {
         //TODO: Implement this.
         if (dir1 == Direction.RIGHT && dir2 == Direction.RIGHT) {
             // left rotation
@@ -63,14 +66,14 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
     }
 
     @Override
-    public Optional<T> removeOne(T value) {
+    public Optional<E> removeOne(E value) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<T> getMax() {
-        Optional<Node<T>> current = Optional.ofNullable(this.root);
-        T max = null;
+    public Optional<E> getMax() {
+        Optional<Node<E>> current = Optional.ofNullable(this.root);
+        E max = null;
         while (current.isPresent()) {
             max = current.get().getValue();
             current = current.get().getRight();
@@ -79,9 +82,9 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
     }
 
     @Override
-    public Optional<T> getMin() {
-        Optional<Node<T>> current = Optional.ofNullable(this.root);
-        T min = null;
+    public Optional<E> getMin() {
+        Optional<Node<E>> current = Optional.ofNullable(this.root);
+        E min = null;
         while (current.isPresent()) {
             min = current.get().getValue();
             current = current.get().getLeft();
@@ -90,27 +93,27 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
     }
 
     @Override
-    public Optional<T> removeMax() {
+    public Optional<E> removeMax() {
         return Optional.empty();
     }
 
     @Override
-    public Optional<T> removeMin() {
+    public Optional<E> removeMin() {
         return Optional.empty();
     }
 
     @Override
-    public Optional<Node<T>> getRoot() {
+    public Optional<Node<E>> getRoot() {
         return Optional.ofNullable(this.root);
     }
 
     @Override
-    public Boolean contains(T value) {
+    public Boolean contains(E value) {
         return null;
     }
 
     @Override
-    public Integer occurrencesOf(T value) {
+    public Integer occurrencesOf(E value) {
         return null;
     }
 
@@ -119,7 +122,7 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
         return heightOf(this.root);
     }
 
-    private Integer balanceOf(Node<T> node) {
+    private Integer balanceOf(Node<E> node) {
         Integer leftHeight = 0;
         Integer rightHeight = 0;
         if (node.getLeft().isPresent()) {
@@ -131,11 +134,11 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
         return leftHeight - rightHeight;
     }
 
-    private Integer heightOf(Node<T> node) {
+    private Integer heightOf(Node<E> node) {
         Integer leftHeight = 0;
         Integer rightHeight = 0;
-        Optional<Node<T>> leftChild = node.getLeft();
-        Optional<Node<T>> rightChild = node.getRight();
+        Optional<Node<E>> leftChild = node.getLeft();
+        Optional<Node<E>> rightChild = node.getRight();
         if (leftChild.isPresent()) {
             leftHeight = 1 + heightOf(leftChild.get());
         }
@@ -151,24 +154,47 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
     }
 
     @Override
-    public List<T> values() {
-        return null;
+    public List<E> values() {
+        List<E> list = new ArrayList<>();
+        iterator().forEachRemaining(list::add);
+        return list;
     }
 
     @Override
-    public Iterator<T> iterator() {
-        return null;
+    public Iterator<E> iterator() {
+        return new TreeIterator(this.root);
     }
 
-    private class TreeIterator implements Iterator<T> {
-        @Override
-        public boolean hasNext() {
-            return false;
+    private class TreeIterator implements Iterator<E> {
+
+        private Stack<Optional<Node<E>>> searchStack;
+        private Optional<Node<E>> current;
+
+        TreeIterator(Node<E> root) {
+            this.searchStack = new Stack<>();
+            current = Optional.ofNullable(root);
         }
 
         @Override
-        public T next() {
-            return null;
+        public boolean hasNext() {
+            return current.isPresent() || !searchStack.empty();
+        }
+
+        @Override
+        public E next() {
+            while (current.isPresent()) {
+                searchStack.push(current);
+                current = current.get().getLeft();
+            }
+
+            Optional<Node<E>> next = searchStack.empty() ? Optional.empty() : searchStack.pop();
+
+            if (next.isPresent()) {
+                current = next.get().getRight();
+                return next.get().getValue();
+            } else {
+                throw new NoSuchElementException();
+            }
         }
     }
 }

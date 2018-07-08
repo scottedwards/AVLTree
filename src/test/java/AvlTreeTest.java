@@ -2,6 +2,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -246,5 +247,21 @@ class AvlTreeTest {
         AvlTree<Integer> tree = new AvlTree<>();
         Iterator<Integer> it = tree.iterator();
         while (it.hasNext()) fail();
+    }
+
+    @Test
+    void iteratorNextMethodReturnsNoElementExceptionWhenNoMoreElements() {
+        AvlTree<Integer> tree = new AvlTree<>();
+        AvlTree<String> strTree = new AvlTree<>();
+        strTree.insertAll(List.of("Hello", "world!"));
+        assertThrows(NoSuchElementException.class, () -> {
+            Iterator<Integer> iterator = tree.iterator();
+            iterator.next();
+        });
+        assertThrows(NoSuchElementException.class, () -> {
+            Iterator<String> stringIterator = strTree.iterator();
+            while(stringIterator.hasNext()) stringIterator.next();
+            stringIterator.next();
+        });
     }
 }
