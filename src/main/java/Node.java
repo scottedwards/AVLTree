@@ -29,6 +29,14 @@ public class Node<E> {
         this.right = right;
     }
 
+    public void set(Direction dir, Node<E> value) {
+        if (dir == Direction.LEFT) {
+            setLeft(value);
+        } else {
+            setRight(value);
+        }
+    }
+
     public Optional<Node<E>> getLeft() {
         return Optional.ofNullable(left);
     }
@@ -36,8 +44,4 @@ public class Node<E> {
     public Optional<Node<E>> getRight() {
         return Optional.ofNullable(right);
     }
-
-
-
-
 }

@@ -1,11 +1,11 @@
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface Tree<T extends Comparable<T>> {
 
-    public void add(T value);
+    public void insert(T value);
 
     public Optional<T> getMax();
 
@@ -31,5 +31,5 @@ public interface Tree<T extends Comparable<T>> {
 
     public Tree<T> filter(Predicate<T> predicate);
 
-    public Collection<T> values();
+    public List<T> values();
 }
