@@ -162,7 +162,7 @@ class AvlTreeTest {
     void containsMethodReturnsFalseWhenElementNotInTree() {
         Tree<String> tree = new AvlTree<>();
         tree.insert("Hello");
-        assertTrue(tree.contains("World!"));
+        assertFalse(tree.contains("World!"));
     }
 
     @Test

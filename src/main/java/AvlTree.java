@@ -109,12 +109,33 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
 
     @Override
     public Boolean contains(E value) {
-        return null;
+        return containsIn(this.root, value);
+    }
+
+    private Boolean containsIn(Node<E> node, E value) {
+        int comp = node.getValue().compareTo(value);
+        if (comp == 0) {
+            return true;
+        } else {
+            Direction direction = (comp < 0) ? Direction.RIGHT : Direction.LEFT;
+            if (node.get(direction).isPresent()) {
+                return containsIn(node.get(direction).get(), value);
+            }
+        }
+        return false;
     }
 
     @Override
     public Integer occurrencesOf(E value) {
-        return null;
+        return (root == null) ? 0 : occurrencesOf(this.root, value);
+    }
+
+    private Integer occurrencesOf(Node<E> node, E value) {
+        Integer count = 0;
+        if (node.getValue().compareTo(value) == 0) count += 1;
+        if (node.getLeft().isPresent()) count += occurrencesOf(node.getLeft().get(), value);
+        if (node.getRight().isPresent()) count += occurrencesOf(node.getRight().get(), value);
+        return count;
     }
 
     @Override
