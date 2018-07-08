@@ -10,7 +10,7 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
     private Node<T> root;
     private Integer size;
 
-    public AvlTree() {
+    AvlTree() {
         this.root = null;
         this.size = 0;
     }
@@ -34,7 +34,7 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
     }
 
     private Direction insertIntoSubtree(Node<T> parent, T value) {
-        Direction direction = (parent.getValue().compareTo(value) <= 0) ? Direction.LEFT : Direction.RIGHT;
+        Direction direction = (parent.getValue().compareTo(value) <= 0) ? Direction.RIGHT : Direction.LEFT;
         Optional<Node<T>> wantedChild = parent.get(direction);
         if (wantedChild.isPresent()) {
             Direction childDirection = insertIntoSubtree(wantedChild.get(), value);
@@ -63,18 +63,30 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
     }
 
     @Override
-    public Optional<T> removeFirst(T value) {
+    public Optional<T> removeOne(T value) {
         return Optional.empty();
     }
 
     @Override
     public Optional<T> getMax() {
-        return Optional.empty();
+        Optional<Node<T>> current = Optional.ofNullable(this.root);
+        T max = null;
+        while (current.isPresent()) {
+            max = current.get().getValue();
+            current = current.get().getRight();
+        }
+        return Optional.ofNullable(max);
     }
 
     @Override
     public Optional<T> getMin() {
-        return Optional.empty();
+        Optional<Node<T>> current = Optional.ofNullable(this.root);
+        T min = null;
+        while (current.isPresent()) {
+            min = current.get().getValue();
+            current = current.get().getLeft();
+        }
+        return Optional.ofNullable(min);
     }
 
     @Override
