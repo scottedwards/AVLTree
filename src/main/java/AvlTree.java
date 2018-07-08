@@ -24,7 +24,11 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
         if (root == null) {
             root = new Node<>(value);
         } else {
-            insertIntoSubtree(root, value);
+            try {
+                insertIntoSubtree(root, value);
+            } catch (ChildNotFoundException cfe) {
+                throw new RuntimeException("Couldn't add element '" + value + "' to tree");
+            }
         }
         this.size++;
     }
@@ -36,14 +40,13 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
         }
     }
 
-    private Direction insertIntoSubtree(Node<E> parent, E value) {
+    private Direction insertIntoSubtree(Node<E> parent, E value) throws ChildNotFoundException {
         Direction direction = (parent.getValue().compareTo(value) <= 0) ? Direction.RIGHT : Direction.LEFT;
         Optional<Node<E>> wantedChild = parent.get(direction);
         if (wantedChild.isPresent()) {
             Direction childDirection = insertIntoSubtree(wantedChild.get(), value);
             Integer balance = balanceOf(parent);
             if (2 <= abs(balance)) {
-                // needs rotating!
                 rotate(parent, direction, childDirection);
             }
         } else {
@@ -52,17 +55,59 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
         return direction;
     }
 
-    private void rotate(Node<E> node, Direction dir1, Direction dir2) {
-        //TODO: Implement this.
+    private void rotate(Node<E> node, Direction dir1, Direction dir2) throws ChildNotFoundException {
+        final String errorMessage = "Child expected to be found but wasn't while rotating tree";
+        Node<E> pivot = node.get(dir1).orElseThrow(
+                () -> new ChildNotFoundException(errorMessage)
+        );
         if (dir1 == Direction.RIGHT && dir2 == Direction.RIGHT) {
-            // left rotation
+            leftRotation(node, pivot);
         } else if (dir1 == Direction.LEFT && dir2 == Direction.LEFT) {
-            // right rotation
+            rightRotation(node, pivot);
         } else if (dir1 == Direction.LEFT && dir2 == Direction.RIGHT) {
             // left-right rotation
+            Node<E> lowPivot = pivot.getRight().orElseThrow(() -> new ChildNotFoundException(errorMessage));
+            rightRotation(pivot, lowPivot);
+            leftRotation(node, lowPivot);
         } else {
-            // right left rotation
+            // right-left rotation
+            Node<E> lowPivot = pivot.getLeft().orElseThrow(() -> new ChildNotFoundException(errorMessage));
+            rightRotation(pivot, lowPivot);
+            leftRotation(node, lowPivot);
         }
+    }
+
+    private void leftRotation(Node<E> r, Node<E> p) {
+        //         r                         p
+        //      /    \                    /    \
+        //    a       p        =>       r       c
+        //          /   \             /   \
+        //         b     c          a      b
+        Optional<Node<E>> parent = r.getParent();
+        Optional<Node<E>> b = p.getLeft();
+        if (parent.isPresent()) {
+            parent.get().swapChild(r, p);
+        } else {
+            this.root = p;
+        }
+        p.setLeft(r);
+        r.setRight(b.orElse(null));
+    }
+
+    private void rightRotation(Node<E> r, Node<E> p) {
+        //             r                         p
+        //          /    \                    /    \
+        //        p       c        =>       a       r
+        //     /   \                              /   \
+        //    a     b                           b      c
+        Optional<Node<E>> parent = r.getParent();
+        Optional<Node<E>> b = p.getRight();
+        if (parent.isPresent()) {
+            parent.get().swapChild(r, p);
+        } else {
+            this.root = p;
+        }        p.setRight(r);
+        r.setLeft(b.orElse(null));
     }
 
     @Override
@@ -147,10 +192,10 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
         Integer leftHeight = 0;
         Integer rightHeight = 0;
         if (node.getLeft().isPresent()) {
-            leftHeight = heightOf(node.getLeft().get());
+            leftHeight = 1 + heightOf(node.getLeft().get());
         }
         if (node.getRight().isPresent()) {
-            rightHeight = heightOf(node.getRight().get());
+            rightHeight = 1 + heightOf(node.getRight().get());
         }
         return leftHeight - rightHeight;
     }

@@ -264,4 +264,36 @@ class AvlTreeTest {
             stringIterator.next();
         });
     }
+
+    @Test
+    void basicLeftRightRebalancingWorks() {
+        Tree<Integer> tree = new AvlTree<>();
+        tree.insertAll(List.of(2, 1, 3, 5, 4));
+        assertEquals(List.of(1, 2, 3, 4, 5), tree.values());
+        assertEquals(2, (int) tree.height());
+
+        assertTrue(tree.getRoot().isPresent());
+        Node<Integer> root = tree.getRoot().get();
+        assertTrue(root.getRight().isPresent());
+        Node<Integer> r = root.getRight().get();
+        assertTrue(r.getLeft().isPresent());
+        assertEquals(4, (int) r.getValue());
+        assertEquals(3, (int) r.getLeft().get().getValue());
+    }
+
+    @Test
+    void basicRightLeftRebalancingWorks() {
+        Tree<Integer> tree = new AvlTree<>();
+        tree.insertAll(List.of(2, 1, 3, 4, 5));
+        assertEquals(List.of(1, 2, 3, 4, 5), tree.values());
+        assertEquals(2, (int) tree.height());
+
+        assertTrue(tree.getRoot().isPresent());
+        Node<Integer> root = tree.getRoot().get();
+        assertTrue(root.getRight().isPresent());
+        Node<Integer> r = root.getRight().get();
+        assertTrue(r.getLeft().isPresent());
+        assertEquals(4, (int) r.getValue());
+        assertEquals(3, (int) r.getLeft().get().getValue());
+    }
 }
