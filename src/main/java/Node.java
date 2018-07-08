@@ -1,3 +1,5 @@
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 import java.util.Optional;
 
@@ -41,7 +43,7 @@ class Node<E> {
         if (right != null) right.setParent(this);
     }
 
-    void set(Direction dir, Node<E> value) {
+    void set(Node<E> value, Direction dir) {
         if (dir == Direction.LEFT) {
             setLeft(value);
         } else {
@@ -71,6 +73,12 @@ class Node<E> {
         } else if (oldChild == this.right) {
             setRight(newChild);
         }
+    }
+
+    Direction getDirectionOfChild(@NotNull Node<E> child) throws ChildNotFoundException {
+        if (this.left == child) return Direction.LEFT;
+        if (this.right == child) return Direction.RIGHT;
+        throw new ChildNotFoundException("The child you are trying to find the direction of is not owned by this node");
     }
 
     @Override

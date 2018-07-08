@@ -91,7 +91,7 @@ class AvlTreeTest {
     void canRemoveOneOccurrenceOfElementFromTree() {
         Tree<Integer> tree = new AvlTree<>();
         tree.insertAll(List.of(1, 2, 2));
-        Optional<Integer> rm = tree.removeOne(2);
+        Optional<Integer> rm = tree.removeFirst(2);
         assertTrue(rm.isPresent());
         assertEquals((int) rm.get(), 2);
         assertEquals(List.of(1, 2), tree.values());
@@ -101,7 +101,7 @@ class AvlTreeTest {
     void usingRemoveWithValueNotInTreeLeavesTreeUnchanged() {
         Tree<Integer> tree = new AvlTree<>();
         tree.insertAll(List.of(1, 2, 2));
-        Optional<Integer> rm = tree.removeOne(3);
+        Optional<Integer> rm = tree.removeFirst(3);
         assertFalse(rm.isPresent());
         assertEquals(List.of(1, 2, 2), tree.values());
     }
@@ -110,8 +110,8 @@ class AvlTreeTest {
     void removeFirstMethodWillLeaveTreeCorrectlyBalanced() {
         Tree<Integer> tree = new AvlTree<>();
         tree.insertAll(List.of(1, 2, 3, 5, 5, 5, 5, 5, 5));
-        tree.removeOne(5);
-        tree.removeOne(5);
+        tree.removeFirst(5);
+        tree.removeFirst(5);
         assertEquals(List.of(1, 2, 3), tree.values());
         assertTrue(3 <= tree.height());
         assertTrue(tree.height() <= 4);
@@ -121,7 +121,7 @@ class AvlTreeTest {
     void removeMinCorrectlyRemovesAndReturnsSmallestElementWhenTreeNotEmpty() {
         Tree<Integer> tree = new AvlTree<>();
         tree.insertAll(List.of(13, 13, -999));
-        Optional<Integer> max = tree.removeMax();
+        Optional<Integer> max = tree.removeMin();
         assertTrue(max.isPresent());
         assertEquals(-999, (int) max.get());
         assertEquals(List.of(13, 13), tree.values());

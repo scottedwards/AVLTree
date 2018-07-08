@@ -50,7 +50,7 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
                 rotate(parent, direction, childDirection);
             }
         } else {
-            parent.set(direction, new Node<>(value));
+            parent.set(new Node<>(value), direction);
         }
         return direction;
     }
@@ -111,40 +111,136 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
     }
 
     @Override
-    public Optional<E> removeOne(E value) {
+    public Optional<E> removeFirst(E value) {
+        if (root == null) return Optional.empty();
+        Optional<Node<E>> nodeToRemove = findFirst(value);
+        nodeToRemove.ifPresent(this::remove);
+        return nodeToRemove.map(Node::getValue);
+    }
+
+    private void remove(Node<E> node) {
+        Optional<Node<E>> parent = node.getParent();
+        Optional<Node<E>> leftChild = node.getLeft();
+        Optional<Node<E>> rightChild = node.getRight();
+        Direction direction = null;
+        try {
+            if (parent.isPresent())
+                direction = parent.get().getDirectionOfChild(node);
+        } catch (ChildNotFoundException cfe) {
+            throw new RuntimeException("Error removing node from tree");
+        }
+        if (leftChild.isPresent() && rightChild.isPresent()) {
+            // find in order successor
+            // Delete it from tree (but keep reference)
+            // replace nodeToRemove with successor
+            Node<E> successor = keepGoingWithDirection(rightChild.get(), Direction.LEFT);
+            remove(successor);
+            node.getLeft().ifPresent(successor::setLeft);
+            node.getRight().ifPresent(successor::setRight);
+            if (parent.isPresent()) {
+                parent.get().swapChild(node, successor);
+            } else {
+                successor.setParent(null);
+                this.root = successor;
+            }
+            node.setLeft(null);
+            node.setRight(null);
+        } else if (leftChild.isPresent()) {
+            // right node ain't present, so connect the left child with the parent
+            removeSingleParent(parent.orElse(null), node, leftChild.get(), Direction.LEFT);
+        } else if (rightChild.isPresent()) {
+            // connect the right child with the parent
+            removeSingleParent(parent.orElse(null), node, rightChild.get(), Direction.RIGHT);
+        } else {
+            // just remove it.
+            parent.ifPresent(p -> p.swapChild(node, null));
+            node.setParent(null);
+        }
+        if (parent.isPresent()){
+            try {
+                retraceBalancing(parent.get(), direction);
+            } catch (ChildNotFoundException cfe) {
+                throw new RuntimeException("Error removing node from tree");
+            }
+        }
+        this.size--;
+    }
+
+    private void retraceBalancing(Node<E> node, Direction direction) throws ChildNotFoundException {
+        if (node != null) {
+            if (2 <= abs(balanceOf(node))) {
+                // needs to be rebalanced
+                Optional<Node<E>> child = node.get(direction);
+                if (child.isPresent()) {
+                    Integer childBalance = balanceOf(child.get());
+                    if (0 < childBalance) {
+                        rotate(node, direction, Direction.LEFT);
+                    } else {
+                        rotate(node, direction, Direction.RIGHT);
+                    }
+                } else {
+                    throw new ChildNotFoundException("Could not find child that was just visited");
+                }
+            }
+            Optional<Node<E>> parent = node.getParent();
+            if (parent.isPresent()) {
+                retraceBalancing(parent.get(), parent.get().getDirectionOfChild(node));
+            }
+        }
+    }
+
+    private void removeSingleParent(Node<E> parent, Node<E> node, Node<E> child, Direction directionOfChild) {
+        if (parent != null) parent.swapChild(node, null);
+        node.setParent(null);
+        node.set(null, directionOfChild);
+        if (parent != null) {
+            parent.swapChild(node, child);
+        } else {
+            this.root = child;
+            child.setParent(null);
+        }
+    }
+
+    @Override
+    public Optional<Node<E>> findFirst(E value) {
         return Optional.empty();
     }
 
     @Override
     public Optional<E> getMax() {
-        Optional<Node<E>> current = Optional.ofNullable(this.root);
-        E max = null;
-        while (current.isPresent()) {
-            max = current.get().getValue();
-            current = current.get().getRight();
-        }
-        return Optional.ofNullable(max);
-    }
+        if (this.root == null) return Optional.empty();
+        return Optional.of(keepGoingWithDirection(this.root, Direction.RIGHT).getValue());    }
 
     @Override
     public Optional<E> getMin() {
-        Optional<Node<E>> current = Optional.ofNullable(this.root);
-        E min = null;
-        while (current.isPresent()) {
-            min = current.get().getValue();
-            current = current.get().getLeft();
+        if (this.root == null) return Optional.empty();
+        return Optional.of(keepGoingWithDirection(this.root, Direction.LEFT).getValue());
+    }
+
+    private Node<E> keepGoingWithDirection(Node<E> start, Direction direction) {
+        Node<E> current = start;
+        Optional<Node<E>> next = current.get(direction);
+        while (next.isPresent()) {
+            current = next.get();
+            next = current.get(direction);
         }
-        return Optional.ofNullable(min);
+        return current;
     }
 
     @Override
     public Optional<E> removeMax() {
-        return Optional.empty();
+        if (this.root == null) return Optional.empty();
+        Node<E> max = keepGoingWithDirection(this.root, Direction.RIGHT);
+        remove(max);
+        return Optional.of(max.getValue());
     }
 
     @Override
     public Optional<E> removeMin() {
-        return Optional.empty();
+        if (this.root == null) return Optional.empty();
+        Node<E> min = keepGoingWithDirection(this.root, Direction.LEFT);
+        remove(min);
+        return Optional.of(min.getValue());
     }
 
     @Override

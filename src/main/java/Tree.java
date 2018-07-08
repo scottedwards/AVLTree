@@ -1,31 +1,33 @@
 import java.util.List;
 import java.util.Optional;
 
-public interface Tree<T extends Comparable<T>> {
+public interface Tree<E extends Comparable<E>> {
 
-    public void insert(T value);
+    void insert(E value);
 
-    public void insertAll(List<T> values);
+    void insertAll(List<E> values);
 
-    public Optional<T> getMax();
+    Optional<E> getMax();
 
-    public Optional<T> getMin();
+    Optional<E> getMin();
 
-    public Optional<T> removeOne(T value);
+    Optional<E> removeFirst(E value);
 
-    public Optional<T> removeMax();
+    Optional<Node<E>> findFirst(E value);
 
-    public Optional<T> removeMin();
+    Optional<E> removeMax();
 
-    public Optional<Node<T>> getRoot();
+    Optional<E> removeMin();
 
-    public Boolean contains(T value);
+    Optional<Node<E>> getRoot();
 
-    public Integer occurrencesOf(T value);
+    Boolean contains(E value);
 
-    public Integer height();
+    Integer occurrencesOf(E value);
 
-    public Integer size();
+    Integer height();
 
-    public List<T> values();
+    Integer size();
+
+    List<E> values();
 }
