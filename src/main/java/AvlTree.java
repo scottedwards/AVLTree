@@ -167,31 +167,31 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
 
     private class TreeIterator implements Iterator<E> {
 
-        private Stack<Optional<Node<E>>> searchStack;
-        private Optional<Node<E>> current;
+        private Stack<Node<E>> searchStack;
+        private Node<E> current;
 
         TreeIterator(Node<E> root) {
             this.searchStack = new Stack<>();
-            current = Optional.ofNullable(root);
+            current = root;
         }
 
         @Override
         public boolean hasNext() {
-            return current.isPresent() || !searchStack.empty();
+            return current != null || !searchStack.empty();
         }
 
         @Override
         public E next() {
-            while (current.isPresent()) {
+            while (current != null) {
                 searchStack.push(current);
-                current = current.get().getLeft();
+                current = current.getLeft().orElse(null);
             }
 
-            Optional<Node<E>> next = searchStack.empty() ? Optional.empty() : searchStack.pop();
+            Node<E> next = searchStack.empty() ? null : searchStack.pop();
 
-            if (next.isPresent()) {
-                current = next.get().getRight();
-                return next.get().getValue();
+            if (next != null) {
+                current = next.getRight().orElse(null);
+                return next.getValue();
             } else {
                 throw new NoSuchElementException();
             }
