@@ -1,12 +1,45 @@
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class AvlTreeTest {
 
     @Test
     void canAddValueToTree() {
-        fail();
+        Tree<Integer> tree = new AvlTree<>();
+        tree.insert(1);
+        tree.insert(2);
+        tree.insert(3);
+        List<Integer> actualContents = tree.values();
+        assertEquals(actualContents, List.of(1, 2, 3));
+    }
+
+    @Test
+    void sizeMethodWorksOnEmptyTree() {
+        Tree<Integer> tree = new AvlTree<>();
+        assertEquals((int) tree.size(), 0);
+    }
+
+    @Test
+    void sizeMethodReturnsExpectedValueOnPopulatedTree() {
+        Tree<Integer> tree = new AvlTree<>();
+        tree.insert(1);
+        tree.insert(2);
+        tree.insert(3);
+        assertEquals((int) tree.size(), 3);
+    }
+
+    @Test
+    void sizeMethodWorksWhenElementsAreAddedAndRemoved() {
+        Tree<Integer> tree = new AvlTree<>();
+        tree.insert(1);
+        tree.insert(2);
+        tree.insert(3);
+        tree.removeMax();
+        assertEquals((int) tree.size(), 2);
     }
 
     @Test

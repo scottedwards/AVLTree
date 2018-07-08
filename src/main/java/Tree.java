@@ -13,9 +13,9 @@ public interface Tree<T extends Comparable<T>> {
 
     public Optional<T> removeFirst(T value);
 
-    public Optional<T> removeMax(T value);
+    public Optional<T> removeMax();
 
-    public Optional<T> removeMin(T value);
+    public Optional<T> removeMin();
 
     public Optional<Node<T>> getRoot();
 
