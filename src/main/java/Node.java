@@ -44,4 +44,8 @@ public class Node<E> {
     public Optional<Node<E>> getRight() {
         return Optional.ofNullable(right);
     }
+
+    public Optional<Node<E>> get(Direction direction) {
+        return Optional.ofNullable((direction == Direction.LEFT) ? left : right);
+    }
 }

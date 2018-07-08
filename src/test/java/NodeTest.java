@@ -54,7 +54,7 @@ class NodeTest {
     }
 
     @Test
-    void setMethodWillSetRightChildCorrectly() {
+    void setMethodWillSetLeftChildCorrectly() {
         Node<Integer> node = new Node<>(1);
         Node<Integer> child = new Node<>(2);
         node.set(Direction.LEFT, child);
@@ -67,12 +67,38 @@ class NodeTest {
     }
 
     @Test
-    void setMethodWillSetLeftChildCorrectly() {
+    void setMethodWillSetRightChildCorrectly() {
         Node<Integer> node = new Node<>(1);
         Node<Integer> child = new Node<>(2);
         node.set(Direction.RIGHT, child);
 
         Optional<Node<Integer>> rightChild = node.getRight();
+        assertTrue(rightChild.isPresent());
+        rightChild.ifPresent(n -> {
+            assertEquals(2, (int) n.getValue());
+        });
+    }
+
+    @Test
+    void getMethodGetsExpectedNodeWhenLeftIsPassedIn() {
+        Node<Integer> node = new Node<>(1);
+        Node<Integer> child = new Node<>(2);
+        node.set(Direction.LEFT, child);
+
+        Optional<Node<Integer>> leftChild = node.get(Direction.LEFT);
+        assertTrue(leftChild.isPresent());
+        leftChild.ifPresent(n -> {
+            assertEquals(2, (int) n.getValue());
+        });
+    }
+
+    @Test
+    void getMethodGetsExpectedNodeWhenRightIsPassedIn() {
+        Node<Integer> node = new Node<>(1);
+        Node<Integer> child = new Node<>(2);
+        node.set(Direction.RIGHT, child);
+
+        Optional<Node<Integer>> rightChild = node.get(Direction.RIGHT);
         assertTrue(rightChild.isPresent());
         rightChild.ifPresent(n -> {
             assertEquals(2, (int) n.getValue());
