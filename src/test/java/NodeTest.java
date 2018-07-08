@@ -16,6 +16,31 @@ class NodeTest {
     }
 
     @Test
+    void getParentReturnsExpectedNodeWhenItHasAParent() {
+        Node<Integer> root = new Node<>(1);
+        Node<Integer> child = new Node<>(2);
+        child.setParent(root);
+        assertTrue(child.getParent().isPresent());
+        assertEquals(root, child.getParent().get());
+    }
+
+    @Test
+    void getParentReturnsEmptyOptionalWhenNoParentIsSet() {
+        Node<Integer> root = new Node<>(1);
+        Node<Integer> child = new Node<>(2);
+        assertFalse(child.getParent().isPresent());
+    }
+
+    @Test
+    void setChildCorrectlySetsNodeAsChildsParent() {
+        Node<Integer> root = new Node<>(1);
+        Node<Integer> child = new Node<>(2);
+        root.setLeft(child);
+        assertTrue(child.getParent().isPresent());
+        assertEquals(root, child.getParent().get());
+    }
+
+    @Test
     void gettingRightChildThatDoesNotExistReturnsEmptyOptional() {
         Node<Integer> node = new Node<>(1);
         assertFalse(node.getRight().isPresent());

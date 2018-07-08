@@ -1,35 +1,47 @@
 import java.util.Objects;
 import java.util.Optional;
 
-public class Node<E> {
+class Node<E> {
     private E value;
+    private Node<E> parent;
     private Node<E> left;
     private Node<E> right;
 
-    public Node(E value) {
+    Node(E value) {
         setValue(value);
+        this.parent = null;
         this.left = null;
         this.right = null;
     }
 
-    public E getValue() {
+    E getValue() {
         return value;
     }
 
-    public void setValue(E value) {
+    void setValue(E value) {
         Objects.requireNonNull(value, "The value of a node cannot be null!");
         this.value = value;
     }
 
-    public void setLeft(Node<E> left) {
+    void setParent(Node<E> parent) {
+        this.parent = parent;
+    }
+
+    Optional<Node<E>> getParent() {
+        return Optional.ofNullable(parent);
+    }
+
+    void setLeft(Node<E> left) {
         this.left = left;
+        left.setParent(this);
     }
 
-    public void setRight(Node<E> right) {
+    void setRight(Node<E> right) {
         this.right = right;
+        right.setParent(this);
     }
 
-    public void set(Direction dir, Node<E> value) {
+    void set(Direction dir, Node<E> value) {
         if (dir == Direction.LEFT) {
             setLeft(value);
         } else {
@@ -37,15 +49,15 @@ public class Node<E> {
         }
     }
 
-    public Optional<Node<E>> getLeft() {
+    Optional<Node<E>> getLeft() {
         return Optional.ofNullable(left);
     }
 
-    public Optional<Node<E>> getRight() {
+    Optional<Node<E>> getRight() {
         return Optional.ofNullable(right);
     }
 
-    public Optional<Node<E>> get(Direction direction) {
+    Optional<Node<E>> get(Direction direction) {
         return Optional.ofNullable((direction == Direction.LEFT) ? left : right);
     }
 }
