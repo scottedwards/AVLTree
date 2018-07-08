@@ -2,8 +2,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 import static java.lang.Math.abs;
 
@@ -26,6 +24,13 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
             insertIntoSubtree(root, value);
         }
         this.size++;
+    }
+
+    @Override
+    public void insertAll(List<T> values) {
+        for (T value: values) {
+            insert(value);
+        }
     }
 
     private Direction insertIntoSubtree(Node<T> parent, T value) {
@@ -131,16 +136,6 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
     @Override
     public Integer size() {
         return this.size;
-    }
-
-    @Override
-    public <R extends Comparable<R>> Tree<R> map(Function<T, R> f) {
-        return null;
-    }
-
-    @Override
-    public Tree<T> filter(Predicate<T> predicate) {
-        return null;
     }
 
     @Override

@@ -1,11 +1,11 @@
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 public interface Tree<T extends Comparable<T>> {
 
     public void insert(T value);
+
+    public void insertAll(List<T> values);
 
     public Optional<T> getMax();
 
@@ -26,10 +26,6 @@ public interface Tree<T extends Comparable<T>> {
     public Integer height();
 
     public Integer size();
-
-    public <R extends Comparable<R>> Tree<R> map(Function<T, R> f);
-
-    public Tree<T> filter(Predicate<T> predicate);
 
     public List<T> values();
 }

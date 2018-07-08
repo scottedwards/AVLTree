@@ -1,9 +1,10 @@
 import org.junit.jupiter.api.Test;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 class AvlTreeTest {
 
@@ -13,157 +14,237 @@ class AvlTreeTest {
         tree.insert(1);
         tree.insert(2);
         tree.insert(3);
-        List<Integer> actualContents = tree.values();
-        assertEquals(actualContents, List.of(1, 2, 3));
+        assertEquals(List.of(1, 2, 3), tree.values());
+    }
+
+    @Test
+    void insertAllMethodAddsAllValuesToTree() {
+        Tree<Integer> tree = new AvlTree<>();
+        List<Integer> expectedOutcome = List.of(1, 2, 3, 4);
+        tree.insertAll(expectedOutcome);
+        assertEquals(4, (int) tree.size());
+        assertEquals(expectedOutcome, tree.values());
+    }
+
+    @Test
+    void insertAllWorksWithEmptyList() {
+        Tree<Integer> tree = new AvlTree<>();
+        List<Integer> expectedOutcome = List.of();
+        tree.insertAll(expectedOutcome);
+        assertEquals(0, (int) tree.size());
+        assertEquals(expectedOutcome, tree.values());
     }
 
     @Test
     void sizeMethodWorksOnEmptyTree() {
         Tree<Integer> tree = new AvlTree<>();
-        assertEquals((int) tree.size(), 0);
+        assertEquals(0, (int) tree.size());
     }
 
     @Test
     void sizeMethodReturnsExpectedValueOnPopulatedTree() {
         Tree<Integer> tree = new AvlTree<>();
-        tree.insert(1);
-        tree.insert(2);
-        tree.insert(3);
-        assertEquals((int) tree.size(), 3);
+        tree.insertAll(List.of(1, 2, 3));
+        assertEquals(3, (int) tree.size());
     }
 
     @Test
     void sizeMethodWorksWhenElementsAreAddedAndRemoved() {
         Tree<Integer> tree = new AvlTree<>();
-        tree.insert(1);
-        tree.insert(2);
-        tree.insert(3);
+        tree.insertAll(List.of(1, 2, 3));
         tree.removeMax();
-        assertEquals((int) tree.size(), 2);
+        assertEquals(2, (int) tree.size());
     }
 
     @Test
     void getMinReturnsEmptyOptionalOnEmptyTree() {
-        fail();
+        Tree<Integer> tree = new AvlTree<>();
+        assertFalse(tree.getMin().isPresent());
     }
 
     @Test
     void getMinReturnsSmallestElementInTree() {
-        fail();
+        Tree<Integer> tree = new AvlTree<>();
+        tree.insertAll(List.of(1, 5, -2));
+        Optional<Integer> min = tree.getMin();
+        assertTrue(min.isPresent());
+        assertEquals(-2, (int) min.get());
     }
 
     @Test
     void returnMaxReturnsEmptyOptionalOnEmptyTree() {
-        fail();
+        Tree<Integer> tree = new AvlTree<>();
+        assertFalse(tree.getMax().isPresent());
     }
 
     @Test
     void returnMaxReturnsLargestElementInTree() {
-        fail();
+        Tree<Integer> tree = new AvlTree<>();
+        tree.insertAll(List.of(13, 13, -999));
+        Optional<Integer> max = tree.getMax();
+        assertTrue(max.isPresent());
+        assertEquals(13, (int) max.get());
     }
 
     @Test
-    void canRemoveOneOccurrencesOfNumberFromTree() {
-        fail();
+    void canRemoveOneOccurrenceOfElementFromTree() {
+        Tree<Integer> tree = new AvlTree<>();
+        tree.insertAll(List.of(1, 2, 2));
+        Optional<Integer> rm = tree.removeFirst(2);
+        assertTrue(rm.isPresent());
+        assertEquals((int) rm.get(), 2);
+        assertEquals(List.of(1, 2), tree.values());
     }
 
     @Test
     void usingRemoveWithValueNotInTreeLeavesTreeUnchanged() {
-        fail();
+        Tree<Integer> tree = new AvlTree<>();
+        tree.insertAll(List.of(1, 2, 2));
+        Optional<Integer> rm = tree.removeFirst(3);
+        assertFalse(rm.isPresent());
+        assertEquals(List.of(1, 2, 2), tree.values());
     }
 
     @Test
     void removeFirstMethodWillLeaveTreeCorrectlyBalanced() {
-        fail();
+        Tree<Integer> tree = new AvlTree<>();
+        tree.insertAll(List.of(1, 2, 3, 5, 5, 5, 5, 5, 5));
+        tree.removeFirst(5);
+        tree.removeFirst(5);
+        assertEquals(List.of(1, 2, 3), tree.values());
+        assertTrue(3 <= tree.height());
+        assertTrue(tree.height() <= 4);
     }
 
     @Test
     void removeMinCorrectlyRemovesAndReturnsSmallestElementWhenTreeNotEmpty() {
-        fail();
+        Tree<Integer> tree = new AvlTree<>();
+        tree.insertAll(List.of(13, 13, -999));
+        Optional<Integer> max = tree.removeMax();
+        assertTrue(max.isPresent());
+        assertEquals(-999, (int) max.get());
+        assertEquals(List.of(13, 13), tree.values());
     }
 
     @Test
     void removeMinReturnsEmptyOptionalWhenTreeEmpty() {
-        fail();
+        Tree<Integer> tree = new AvlTree<>();
+        Optional<Integer> rm = tree.removeMin();
+        assertFalse(rm.isPresent());
     }
 
     @Test
     void removeMaxCorrectlyRemovesAndReturnsLargestElementWhenTreeNotEmpty() {
-        fail();
+        Tree<Integer> tree = new AvlTree<>();
+        tree.insertAll(List.of(13, 13, -999));
+        Optional<Integer> max = tree.removeMax();
+        assertTrue(max.isPresent());
+        assertEquals(13, (int) max.get());
+        assertEquals(List.of(-999, 13), tree.values());
     }
 
     @Test
     void removeMaxReturnsEmptyOptionalWHenTreeIsEmpty() {
-        fail();
-    }
-
-    @Test
-    void getOccurrencesReturnsCorrectValueForNumberOfInstancesOfCertainValueInTree() {
-        fail();
+        Tree<Integer> tree = new AvlTree<>();
+        Optional<Integer> rm = tree.removeMax();
+        assertFalse(rm.isPresent());
     }
 
     @Test
     void containsMethodReturnsTrueWhenElementInTheTree() {
-        fail();
+        Tree<String> tree = new AvlTree<>();
+        tree.insert("Hello");
+        assertTrue(tree.contains("Hello"));
     }
 
     @Test
     void containsMethodReturnsFalseWhenElementNotInTree() {
-        fail();
+        Tree<String> tree = new AvlTree<>();
+        tree.insert("Hello");
+        assertTrue(tree.contains("World!"));
     }
 
     @Test
     void getRootWillReturnCorrectRoot() {
-        fail();
+        Tree<Integer> tree1 = new AvlTree<>();
+        tree1.insert(1);
+        Tree<Integer> tree2 = new AvlTree<>();
+        tree2.insertAll(List.of(1, 2, 3));
+
+        Optional<Node<Integer>> root1 = tree1.getRoot();
+        assertTrue(root1.isPresent());
+        assertEquals(1, (int) root1.get().getValue());
+
+        Optional<Node<Integer>> root2 = tree2.getRoot();
+        assertTrue(root2.isPresent());
+        assertEquals(2, (int) root2.get().getValue());
     }
 
     @Test
     void getRootOnEmptyTreeWillReturnEmptyOptional() {
-        fail();
+        Tree<Boolean> tree = new AvlTree<>();
+        Optional<Node<Boolean>> root = tree.getRoot();
+        assertFalse(root.isPresent());
+    }
+
+    @Test
+    void occurrencesOfReturnsCorrectValueForNumberOfInstancesOfCertainValueInTree() {
+        Tree<Integer> tree = new AvlTree<>();
+        tree.insertAll(List.of(1, 2, 3, 1, 1, 2, 2, 2, 1, 1));
+        assertEquals(10, (int) tree.size());
+        assertEquals(5, (int) tree.occurrencesOf(1));
+        assertEquals(4, (int) tree.occurrencesOf(2));
+        assertEquals(1, (int) tree.occurrencesOf(3));
     }
 
     @Test
     void occurrencesOfReturnsExpectedValueOnEmptyTree() {
-        fail();
+        Tree<Integer> tree = new AvlTree<>();
+        assertEquals(0, (int) tree.occurrencesOf(1));
     }
 
     @Test
-    void occurrencesOfReturnsExpectedValueOnPopulatedTree() {
-        fail();
+    void valuesReturnsExpectedListOfValuesInTreeInSortedOrder() {
+        Tree<Integer> tree = new AvlTree<>();
+        tree.insertAll(List.of(1, 4, 2, -4));
+        assertEquals(List.of(-4, 1, 2, 4), tree.values());
     }
 
     @Test
-    void mapMethodReturnsExpectedTreeOnPopulatedTree() {
-        fail();
+    void valuesMethodOnEmptyTreeReturnsEmptyList() {
+        Tree<Integer> tree = new AvlTree<>();
+        assertEquals(0, (int) tree.values().size());
     }
 
     @Test
-    void mapMethodReturnsEmptyTreeWhenGivenEmptyTree() {
-        fail();
+    void canIterateThroughPopulatedTree() {
+        AvlTree<Integer> tree = new AvlTree<>();
+        tree.insertAll(List.of(4, 7, -2, 10, 13, 14, 15));
+        Iterator<Integer> it = tree.iterator();
+        Integer sum = 0;
+        while (it.hasNext()) {
+            sum += it.next();
+        }
+        assertEquals(61, (int) sum);
     }
 
     @Test
-    void filterMethodCorrectlyReturnsAVLTreeThatSatisfiesPredicate() {
-        fail();
-    }
-
-    @Test
-    void filterMethodReturnsEmptyTreeWhenUsedOnEmptyTree() {
-        fail();
-    }
-
-    @Test
-    void valuesReturnsExpectedListOfValuesInTree() {
-        fail();
-    }
-
-    @Test
-    void canIterateThroughPopulatedTreeCorrectly() {
-        fail();
+    void iteratorGoesThroughTreeInExpectedOrder() {
+        AvlTree<Integer> tree = new AvlTree<>();
+        tree.insertAll(List.of(4, 7, -2, 10, 13, 14, 15));
+        Iterator<Integer> it = tree.iterator();
+        Integer current = -2;
+        while (it.hasNext()) {
+            Integer next = it.next();
+            assertTrue(current <= next);
+            current = next;
+        }
     }
 
     @Test
     void iteratorFromEmptyTreeHasNoValues() {
-        fail();
+        AvlTree<Integer> tree = new AvlTree<>();
+        Iterator<Integer> it = tree.iterator();
+        while (it.hasNext()) fail();
     }
 }
