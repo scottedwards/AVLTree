@@ -33,12 +33,12 @@ class Node<E> {
 
     void setLeft(Node<E> left) {
         this.left = left;
-        left.setParent(this);
+        if (left != null) left.setParent(this);
     }
 
     void setRight(Node<E> right) {
         this.right = right;
-        right.setParent(this);
+        if (right != null) right.setParent(this);
     }
 
     void set(Direction dir, Node<E> value) {
@@ -59,5 +59,22 @@ class Node<E> {
 
     Optional<Node<E>> get(Direction direction) {
         return Optional.ofNullable((direction == Direction.LEFT) ? left : right);
+    }
+
+    void swapChild(Node<E> oldChild, Node<E> newChild) {
+        oldChild.setParent(null);
+        if (newChild != null) {
+            newChild.getParent().ifPresent(parent -> parent.swapChild(newChild, null));
+        }
+        if (oldChild == this.left) {
+            setLeft(newChild);
+        } else if (oldChild == this.right) {
+            setRight(newChild);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return value.toString();
     }
 }

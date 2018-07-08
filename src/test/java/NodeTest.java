@@ -129,4 +129,27 @@ class NodeTest {
             assertEquals(2, (int) n.getValue());
         });
     }
+
+    @Test
+    void swapChildMethodCanSwapChildren() {
+        Node<Integer> a = new Node<>(1);
+        Node<Integer> b = new Node<>(2);
+        Node<Integer> c = new Node<>(3);
+        Node<Integer> d = new Node<>(4);
+        Node<Integer> e = new Node<>(5);
+
+        a.setLeft(b); a.setRight(c);
+        d.setRight(e);
+
+        a.swapChild(b, e);
+
+        assertFalse(b.getParent().isPresent());
+        assertFalse(d.getRight().isPresent());
+
+        assertTrue(a.getLeft().isPresent());
+        assertEquals(e, a.getLeft().get());
+
+        assertTrue(a.getRight().isPresent());
+        assertEquals(c, a.getRight().get());
+    }
 }
