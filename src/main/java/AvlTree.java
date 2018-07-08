@@ -45,6 +45,7 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
     }
 
     private void rotate(Node<T> node, Direction dir1, Direction dir2) {
+        //TODO: Implement this.
         if (dir1 == Direction.RIGHT && dir2 == Direction.RIGHT) {
             // left rotation
         } else if (dir1 == Direction.LEFT && dir2 == Direction.LEFT) {
@@ -83,7 +84,7 @@ public class AvlTree <T extends Comparable<T>> implements Tree<T>, Iterable<T> {
 
     @Override
     public Optional<Node<T>> getRoot() {
-        return Optional.empty();
+        return Optional.ofNullable(this.root);
     }
 
     @Override
