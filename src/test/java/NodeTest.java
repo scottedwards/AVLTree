@@ -9,9 +9,7 @@ class NodeTest {
     @Test
     void settingNodeValueToNullGivesError() {
         final Node<Integer> node = new Node<>(1);
-        final NullPointerException npe = assertThrows(NullPointerException.class, () -> {
-            node.setValue(null);
-        });
+        final NullPointerException npe = assertThrows(NullPointerException.class, () -> node.setValue(null));
         assertEquals("The value of a node cannot be null!", npe.getMessage());
     }
 
@@ -26,7 +24,6 @@ class NodeTest {
 
     @Test
     void getParentReturnsEmptyOptionalWhenNoParentIsSet() {
-        final Node<Integer> root = new Node<>(1);
         final Node<Integer> child = new Node<>(2);
         assertFalse(child.getParent().isPresent());
     }
@@ -60,9 +57,7 @@ class NodeTest {
 
         final Optional<Node<Integer>> leftChild = node.getLeft();
         assertTrue(leftChild.isPresent());
-        leftChild.ifPresent(n -> {
-            assertEquals(2, (int) n.getValue());
-        });
+        leftChild.ifPresent(n -> assertEquals(2, (int) n.getValue()));
     }
 
     @Test
@@ -73,9 +68,7 @@ class NodeTest {
 
         final Optional<Node<Integer>> rightChild = node.getRight();
         assertTrue(rightChild.isPresent());
-        rightChild.ifPresent(n -> {
-            assertEquals(2, (int) n.getValue());
-        });
+        rightChild.ifPresent(n -> assertEquals(2, (int) n.getValue()));
     }
 
     @Test
@@ -86,9 +79,7 @@ class NodeTest {
 
         final Optional<Node<Integer>> leftChild = node.getLeft();
         assertTrue(leftChild.isPresent());
-        leftChild.ifPresent(n -> {
-            assertEquals(2, (int) n.getValue());
-        });
+        leftChild.ifPresent(n -> assertEquals(2, (int) n.getValue()));
     }
 
     @Test
@@ -99,9 +90,7 @@ class NodeTest {
 
         final Optional<Node<Integer>> rightChild = node.getRight();
         assertTrue(rightChild.isPresent());
-        rightChild.ifPresent(n -> {
-            assertEquals(2, (int) n.getValue());
-        });
+        rightChild.ifPresent(n -> assertEquals(2, (int) n.getValue()));
     }
 
     @Test
@@ -134,9 +123,7 @@ class NodeTest {
 
         Optional<Node<Integer>> leftChild = node.get(Direction.LEFT);
         assertTrue(leftChild.isPresent());
-        leftChild.ifPresent(n -> {
-            assertEquals(2, (int) n.getValue());
-        });
+        leftChild.ifPresent(n -> assertEquals(2, (int) n.getValue()));
     }
 
     @Test
@@ -147,9 +134,7 @@ class NodeTest {
 
         Optional<Node<Integer>> rightChild = node.get(Direction.RIGHT);
         assertTrue(rightChild.isPresent());
-        rightChild.ifPresent(n -> {
-            assertEquals(2, (int) n.getValue());
-        });
+        rightChild.ifPresent(n -> assertEquals(2, (int) n.getValue()));
     }
 
     @Test
