@@ -8,8 +8,8 @@ class NodeTest {
 
     @Test
     void settingNodeValueToNullGivesError() {
-        Node<Integer> node = new Node<>(1);
-        NullPointerException npe = assertThrows(NullPointerException.class, () -> {
+        final Node<Integer> node = new Node<>(1);
+        final NullPointerException npe = assertThrows(NullPointerException.class, () -> {
             node.setValue(null);
         });
         assertEquals("The value of a node cannot be null!", npe.getMessage());
@@ -17,8 +17,8 @@ class NodeTest {
 
     @Test
     void getParentReturnsExpectedNodeWhenItHasAParent() {
-        Node<Integer> root = new Node<>(1);
-        Node<Integer> child = new Node<>(2);
+        final Node<Integer> root = new Node<>(1);
+        final Node<Integer> child = new Node<>(2);
         child.setParent(root);
         assertTrue(child.getParent().isPresent());
         assertEquals(root, child.getParent().get());
@@ -26,15 +26,15 @@ class NodeTest {
 
     @Test
     void getParentReturnsEmptyOptionalWhenNoParentIsSet() {
-        Node<Integer> root = new Node<>(1);
-        Node<Integer> child = new Node<>(2);
+        final Node<Integer> root = new Node<>(1);
+        final Node<Integer> child = new Node<>(2);
         assertFalse(child.getParent().isPresent());
     }
 
     @Test
-    void setChildCorrectlySetsNodeAsChildsParent() {
-        Node<Integer> root = new Node<>(1);
-        Node<Integer> child = new Node<>(2);
+    void setChildCorrectlySetsParent() {
+        final Node<Integer> root = new Node<>(1);
+        final Node<Integer> child = new Node<>(2);
         root.setLeft(child);
         assertTrue(child.getParent().isPresent());
         assertEquals(root, child.getParent().get());
@@ -42,23 +42,23 @@ class NodeTest {
 
     @Test
     void gettingRightChildThatDoesNotExistReturnsEmptyOptional() {
-        Node<Integer> node = new Node<>(1);
+        final Node<Integer> node = new Node<>(1);
         assertFalse(node.getRight().isPresent());
     }
 
     @Test
     void gettingLeftChildThatDoesNotExistReturnsEmptyOptional() {
-        Node<Integer> node = new Node<>(1);
+        final Node<Integer> node = new Node<>(1);
         assertFalse(node.getLeft().isPresent());
     }
 
     @Test
     void canSetAndReturnLeftChild() {
-        Node<Integer> node = new Node<>(1);
-        Node<Integer> child = new Node<>(2);
+        final Node<Integer> node = new Node<>(1);
+        final Node<Integer> child = new Node<>(2);
         node.setLeft(child);
 
-        Optional<Node<Integer>> leftChild = node.getLeft();
+        final Optional<Node<Integer>> leftChild = node.getLeft();
         assertTrue(leftChild.isPresent());
         leftChild.ifPresent(n -> {
             assertEquals(2, (int) n.getValue());
@@ -67,11 +67,11 @@ class NodeTest {
 
     @Test
     void canSetAndReturnRightChild() {
-        Node<Integer> node = new Node<>(1);
-        Node<Integer> child = new Node<>(2);
+        final Node<Integer> node = new Node<>(1);
+        final Node<Integer> child = new Node<>(2);
         node.setRight(child);
 
-        Optional<Node<Integer>> rightChild = node.getRight();
+        final Optional<Node<Integer>> rightChild = node.getRight();
         assertTrue(rightChild.isPresent());
         rightChild.ifPresent(n -> {
             assertEquals(2, (int) n.getValue());
@@ -80,11 +80,11 @@ class NodeTest {
 
     @Test
     void setMethodWillSetLeftChildCorrectly() {
-        Node<Integer> node = new Node<>(1);
-        Node<Integer> child = new Node<>(2);
+        final Node<Integer> node = new Node<>(1);
+        final Node<Integer> child = new Node<>(2);
         node.set(child, Direction.LEFT);
 
-        Optional<Node<Integer>> leftChild = node.getLeft();
+        final Optional<Node<Integer>> leftChild = node.getLeft();
         assertTrue(leftChild.isPresent());
         leftChild.ifPresent(n -> {
             assertEquals(2, (int) n.getValue());
@@ -93,11 +93,11 @@ class NodeTest {
 
     @Test
     void setMethodWillSetRightChildCorrectly() {
-        Node<Integer> node = new Node<>(1);
-        Node<Integer> child = new Node<>(2);
+        final Node<Integer> node = new Node<>(1);
+        final Node<Integer> child = new Node<>(2);
         node.set(child, Direction.RIGHT);
 
-        Optional<Node<Integer>> rightChild = node.getRight();
+        final Optional<Node<Integer>> rightChild = node.getRight();
         assertTrue(rightChild.isPresent());
         rightChild.ifPresent(n -> {
             assertEquals(2, (int) n.getValue());
@@ -105,9 +105,31 @@ class NodeTest {
     }
 
     @Test
+    void removeLeftWillRemoveReferenceToChildFromParent() {
+        final Node<Integer> node = new Node<>(1);
+        final Node<Integer> child = new Node<>(2);
+        node.set(child, Direction.LEFT);
+
+        node.removeLeft();
+
+        assertFalse(node.getLeft().isPresent());
+    }
+
+    @Test
+    void removeRightWillRemoveReferenceToChildFromParent() {
+        final Node<Integer> node = new Node<>(1);
+        final Node<Integer> child = new Node<>(2);
+        node.set(child, Direction.RIGHT);
+
+        node.removeRight();
+
+        assertFalse(node.getRight().isPresent());
+    }
+
+    @Test
     void getMethodGetsExpectedNodeWhenLeftIsPassedIn() {
-        Node<Integer> node = new Node<>(1);
-        Node<Integer> child = new Node<>(2);
+        final Node<Integer> node = new Node<>(1);
+        final Node<Integer> child = new Node<>(2);
         node.set(child, Direction.LEFT);
 
         Optional<Node<Integer>> leftChild = node.get(Direction.LEFT);
@@ -119,8 +141,8 @@ class NodeTest {
 
     @Test
     void getMethodGetsExpectedNodeWhenRightIsPassedIn() {
-        Node<Integer> node = new Node<>(1);
-        Node<Integer> child = new Node<>(2);
+        final Node<Integer> node = new Node<>(1);
+        final Node<Integer> child = new Node<>(2);
         node.set(child, Direction.RIGHT);
 
         Optional<Node<Integer>> rightChild = node.get(Direction.RIGHT);
@@ -131,25 +153,29 @@ class NodeTest {
     }
 
     @Test
-    void swapChildMethodCanSwapChildren() {
-        Node<Integer> a = new Node<>(1);
-        Node<Integer> b = new Node<>(2);
-        Node<Integer> c = new Node<>(3);
-        Node<Integer> d = new Node<>(4);
-        Node<Integer> e = new Node<>(5);
+    void getDirectionReturnsCorrectDirection() {
+        final Node<Integer> node = new Node<>(1);
+        final Node<Integer> lChild = new Node<>(2);
+        final Node<Integer> rChild = new Node<>(2);
+        node.set(rChild, Direction.RIGHT);
+        node.set(lChild, Direction.LEFT);
 
-        a.setLeft(b); a.setRight(c);
-        d.setRight(e);
+        Optional<Direction> rDirection = node.getDirection(rChild);
+        Optional<Direction> lDirection = node.getDirection(lChild);
 
-        a.swapChild(b, e);
+        assertTrue(rDirection.isPresent());
+        assertTrue(lDirection.isPresent());
+        assertEquals(Direction.RIGHT, rDirection.get());
+        assertEquals(Direction.LEFT, lDirection.get());
+    }
 
-        assertFalse(b.getParent().isPresent());
-        assertFalse(d.getRight().isPresent());
+    @Test
+    void getDirectionReturnsEmptyOptionalWhenNodeNotPresent() {
+        final Node<Integer> node = new Node<>(1);
+        final Node<Integer> child = new Node<>(2);
 
-        assertTrue(a.getLeft().isPresent());
-        assertEquals(e, a.getLeft().get());
+        Optional<Direction> direction = node.getDirection(child);
 
-        assertTrue(a.getRight().isPresent());
-        assertEquals(c, a.getRight().get());
+        assertFalse(direction.isPresent());
     }
 }

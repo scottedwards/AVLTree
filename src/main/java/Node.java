@@ -1,7 +1,6 @@
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
 import java.util.Optional;
+
+import static java.util.Objects.requireNonNull;
 
 class Node<E> {
     private E value;
@@ -9,7 +8,7 @@ class Node<E> {
     private Node<E> left;
     private Node<E> right;
 
-    Node(E value) {
+    Node(final E value) {
         setValue(value);
         this.parent = null;
         this.left = null;
@@ -20,12 +19,13 @@ class Node<E> {
         return value;
     }
 
-    void setValue(E value) {
-        Objects.requireNonNull(value, "The value of a node cannot be null!");
+    void setValue(final E value) {
+        requireNonNull(value, "The value of a node cannot be null!");
         this.value = value;
     }
 
-    void setParent(Node<E> parent) {
+    void setParent(final Node<E> parent) {
+        requireNonNull(parent, "The parent cannot be null, use remove parent instead");
         this.parent = parent;
     }
 
@@ -33,21 +33,36 @@ class Node<E> {
         return Optional.ofNullable(parent);
     }
 
-    void setLeft(Node<E> left) {
+    void removeParent() {
+        this.parent = null;
+    }
+
+    void setLeft(final Node<E> left) {
+        requireNonNull(left, "The node cannot be null");
         this.left = left;
-        if (left != null) left.setParent(this);
+        left.setParent(this);
     }
 
-    void setRight(Node<E> right) {
+    void removeLeft() {
+        this.left = null;
+    }
+
+    void setRight(final Node<E> right) {
+        requireNonNull(right, "The node cannot be null");
         this.right = right;
-        if (right != null) right.setParent(this);
     }
 
-    void set(Node<E> value, Direction dir) {
+    void removeRight() {
+        this.right = null;
+    }
+
+    void set(final Node<E> node, final Direction dir) {
+        requireNonNull(node, "The node cannot be null");
+        requireNonNull(dir, "The direction cannot be null");
         if (dir == Direction.LEFT) {
-            setLeft(value);
+            setLeft(node);
         } else {
-            setRight(value);
+            setRight(node);
         }
     }
 
@@ -59,26 +74,19 @@ class Node<E> {
         return Optional.ofNullable(right);
     }
 
-    Optional<Node<E>> get(Direction direction) {
+    Optional<Node<E>> get(final Direction direction) {
+        requireNonNull(direction, "The direction cannot be null");
         return Optional.ofNullable((direction == Direction.LEFT) ? left : right);
     }
 
-    void swapChild(Node<E> oldChild, Node<E> newChild) {
-        oldChild.setParent(null);
-        if (newChild != null) {
-            newChild.getParent().ifPresent(parent -> parent.swapChild(newChild, null));
+    Optional<Direction> getDirection(final Node<E> node) {
+        requireNonNull(node, "The node cannot be null");
+        if (this.left == node) {
+            return Optional.of(Direction.LEFT);
         }
-        if (oldChild == this.left) {
-            setLeft(newChild);
-        } else if (oldChild == this.right) {
-            setRight(newChild);
-        }
-    }
-
-    Direction getDirectionOfChild(@NotNull Node<E> child) throws ChildNotFoundException {
-        if (this.left == child) return Direction.LEFT;
-        if (this.right == child) return Direction.RIGHT;
-        throw new ChildNotFoundException("The child you are trying to find the direction of is not owned by this node");
+        if (this.right == node)
+            return Optional.of(Direction.RIGHT);
+        return Optional.empty();
     }
 
     @Override

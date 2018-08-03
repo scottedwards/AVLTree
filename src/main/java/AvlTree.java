@@ -86,7 +86,7 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
         Optional<Node<E>> parent = r.getParent();
         Optional<Node<E>> b = p.getLeft();
         if (parent.isPresent()) {
-            parent.get().swapChild(r, p);
+            // TODO parent.get().replaceChild(r, p);
         } else {
             this.root = p;
         }
@@ -103,101 +103,31 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
         Optional<Node<E>> parent = r.getParent();
         Optional<Node<E>> b = p.getRight();
         if (parent.isPresent()) {
-            parent.get().swapChild(r, p);
+            // TODO parent.get().replaceChild(r, p);
         } else {
             this.root = p;
-        }        p.setRight(r);
+        }
+        p.setRight(r);
         r.setLeft(b.orElse(null));
     }
 
     @Override
-    public Optional<E> removeFirst(E value) {
+    public Optional<E> removeFirst(final E value) {
         if (root == null) return Optional.empty();
         Optional<Node<E>> nodeToRemove = findFirst(value);
         nodeToRemove.ifPresent(this::remove);
         return nodeToRemove.map(Node::getValue);
     }
 
-    private void remove(Node<E> node) {
+    void remove(final Node<E> node) {
+        Objects.requireNonNull(node, "Node cannot be null");
         Optional<Node<E>> parent = node.getParent();
-        Optional<Node<E>> leftChild = node.getLeft();
-        Optional<Node<E>> rightChild = node.getRight();
-        Direction direction = null;
-        try {
-            if (parent.isPresent())
-                direction = parent.get().getDirectionOfChild(node);
-        } catch (ChildNotFoundException cfe) {
-            throw new RuntimeException("Error removing node from tree");
-        }
-        if (leftChild.isPresent() && rightChild.isPresent()) {
-            // find in order successor
-            // Delete it from tree (but keep reference)
-            // replace nodeToRemove with successor
-            Node<E> successor = keepGoingWithDirection(rightChild.get(), Direction.LEFT);
-            remove(successor);
-            node.getLeft().ifPresent(successor::setLeft);
-            node.getRight().ifPresent(successor::setRight);
-            if (parent.isPresent()) {
-                parent.get().swapChild(node, successor);
-            } else {
-                successor.setParent(null);
-                this.root = successor;
-            }
-            node.setLeft(null);
-            node.setRight(null);
-        } else if (leftChild.isPresent()) {
-            // right node ain't present, so connect the left child with the parent
-            removeSingleParent(parent.orElse(null), node, leftChild.get(), Direction.LEFT);
-        } else if (rightChild.isPresent()) {
-            // connect the right child with the parent
-            removeSingleParent(parent.orElse(null), node, rightChild.get(), Direction.RIGHT);
-        } else {
-            // just remove it.
-            parent.ifPresent(p -> p.swapChild(node, null));
-            node.setParent(null);
-        }
-        if (parent.isPresent()){
-            try {
-                retraceBalancing(parent.get(), direction);
-            } catch (ChildNotFoundException cfe) {
-                throw new RuntimeException("Error removing node from tree");
-            }
-        }
-        this.size--;
-    }
-
-    private void retraceBalancing(Node<E> node, Direction direction) throws ChildNotFoundException {
-        if (node != null) {
-            if (2 <= abs(balanceOf(node))) {
-                // needs to be rebalanced
-                Optional<Node<E>> child = node.get(direction);
-                if (child.isPresent()) {
-                    Integer childBalance = balanceOf(child.get());
-                    if (0 < childBalance) {
-                        rotate(node, direction, Direction.LEFT);
-                    } else {
-                        rotate(node, direction, Direction.RIGHT);
-                    }
-                } else {
-                    throw new ChildNotFoundException("Could not find child that was just visited");
-                }
-            }
-            Optional<Node<E>> parent = node.getParent();
-            if (parent.isPresent()) {
-                retraceBalancing(parent.get(), parent.get().getDirectionOfChild(node));
-            }
-        }
-    }
-
-    private void removeSingleParent(Node<E> parent, Node<E> node, Node<E> child, Direction directionOfChild) {
-        if (parent != null) parent.swapChild(node, null);
-        node.setParent(null);
-        node.set(null, directionOfChild);
-        if (parent != null) {
-            parent.swapChild(node, child);
-        } else {
-            this.root = child;
-            child.setParent(null);
+        if (!node.getLeft().isPresent() && !node.getRight().isPresent()) {
+            // node is a leaf
+            parent.ifPresent(p -> {
+//                p.removeChild(node);
+            });
+            node.removeParent();
         }
     }
 
