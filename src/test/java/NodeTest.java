@@ -94,6 +94,30 @@ class NodeTest {
     }
 
     @Test
+    void setLeftWillSetParentOfChild() {
+        final Node<Integer> node = new Node<>(1);
+        final Node<Integer> child = new Node<>(2);
+        node.setLeft(child);
+
+        final Optional<Node<Integer>> parent = child.getParent();
+
+        assertTrue(parent.isPresent());
+        assertEquals(node, parent.get());
+    }
+
+    @Test
+    void setRightWillSetParentOfChild() {
+        final Node<Integer> node = new Node<>(1);
+        final Node<Integer> child = new Node<>(2);
+        node.setRight(child);
+
+        final Optional<Node<Integer>> parent = child.getParent();
+
+        assertTrue(parent.isPresent());
+        assertEquals(node, parent.get());
+    }
+
+    @Test
     void removeLeftWillRemoveReferenceToChildFromParent() {
         final Node<Integer> node = new Node<>(1);
         final Node<Integer> child = new Node<>(2);

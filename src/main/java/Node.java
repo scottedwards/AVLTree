@@ -50,6 +50,7 @@ class Node<E> {
     void setRight(final Node<E> right) {
         requireNonNull(right, "The node cannot be null");
         this.right = right;
+        right.setParent(this);
     }
 
     void removeRight() {
