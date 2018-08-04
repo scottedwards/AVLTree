@@ -143,13 +143,8 @@ public class AvlTree<E extends Comparable<E>> implements Tree<E>, Iterable<E> {
     void remove(final Node<E> node) {
         requireNonNull(node, "Node cannot be null");
         Optional<Node<E>> parent = node.getParent();
-        if (!node.getLeft().isPresent() && !node.getRight().isPresent()) {
-            // node is a leaf
-            parent.ifPresent(p -> {
-//                p.removeChild(node);
-            });
-            node.removeParent();
-        }
+
+        size--;
     }
 
     @Override

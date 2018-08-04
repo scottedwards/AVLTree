@@ -55,6 +55,7 @@ class AvlTreeTest {
         tree.insertAll(List.of(1, 2, 3));
         tree.removeMax();
         assertEquals(2, (int) tree.size());
+        assertEquals(2, tree.values().size());
     }
 
     @Test

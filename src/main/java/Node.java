@@ -57,14 +57,22 @@ class Node<E> {
         this.right = null;
     }
 
-    void set(final Node<E> node, final Direction dir) {
+    void set(final Node<E> node, final Direction direction) {
         requireNonNull(node, "The node cannot be null");
-        requireNonNull(dir, "The direction cannot be null");
-        if (dir == Direction.LEFT) {
+        requireNonNull(direction, "The direction cannot be null");
+        if (direction == Direction.LEFT) {
             setLeft(node);
         } else {
             setRight(node);
         }
+    }
+
+    void remove(final Direction direction) {
+        requireNonNull(direction, "The direction cannot be null");
+        if (direction == Direction.LEFT)
+            removeLeft();
+        if (direction == Direction.RIGHT)
+            removeRight();
     }
 
     Optional<Node<E>> getLeft() {
