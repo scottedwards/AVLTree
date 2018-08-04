@@ -1,14 +1,16 @@
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Stack;
 
 import static java.lang.Math.abs;
+import static java.util.Objects.requireNonNull;
 
-public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
+public class AvlTree<E extends Comparable<E>> implements Tree<E>, Iterable<E> {
 
     private Node<E> root;
     private Integer size;
@@ -20,7 +22,7 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
 
     @Override
     public void insert(E value) {
-        Objects.requireNonNull(value, "You cannot enter null as a value!");
+        requireNonNull(value, "You cannot enter null as a value!");
         if (root == null) {
             root = new Node<>(value);
         } else {
@@ -35,7 +37,7 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
 
     @Override
     public void insertAll(List<E> values) {
-        for (E value: values) {
+        for (E value : values) {
             insert(value);
         }
     }
@@ -77,42 +79,61 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
         }
     }
 
-    private void leftRotation(Node<E> r, Node<E> p) {
+    private void leftRotation(final Node<E> r, final Node<E> p) {
         //         r                         p
         //      /    \                    /    \
         //    a       p        =>       r       c
         //          /   \             /   \
         //         b     c          a      b
+        requireNonNull(r, "The root of the rotation cannot be null");
+        requireNonNull(p, "The pivot cannot be null");
         Optional<Node<E>> parent = r.getParent();
         Optional<Node<E>> b = p.getLeft();
         if (parent.isPresent()) {
-            // TODO parent.get().replaceChild(r, p);
+            Optional<Direction> direction = parent.get().getDirection(r);
+            direction.ifPresent(dir -> parent.get().set(p, dir));
+            r.removeParent();
         } else {
+            p.removeParent();
             this.root = p;
         }
+        r.getLeft().ifPresent(node -> {
+            if (node == p) r.removeLeft();
+        });
         p.setLeft(r);
-        r.setRight(b.orElse(null));
+        r.removeRight();
+        b.ifPresent(r::setRight);
     }
 
-    private void rightRotation(Node<E> r, Node<E> p) {
+    private void rightRotation(final Node<E> r, final Node<E> p) {
         //             r                         p
         //          /    \                    /    \
         //        p       c        =>       a       r
         //     /   \                              /   \
         //    a     b                           b      c
+        requireNonNull(r, "The root of the rotation cannot be null");
+        requireNonNull(p, "The pivot cannot be null");
         Optional<Node<E>> parent = r.getParent();
         Optional<Node<E>> b = p.getRight();
         if (parent.isPresent()) {
-            // TODO parent.get().replaceChild(r, p);
+            Optional<Direction> direction = parent.get().getDirection(r);
+            direction.ifPresent(dir -> parent.get().set(p, dir));
+            r.removeParent();
         } else {
+            p.removeParent();
             this.root = p;
         }
         p.setRight(r);
-        r.setLeft(b.orElse(null));
+        r.removeLeft();
+        b.ifPresent(r::setLeft);
+        r.getRight().ifPresent(node -> {
+            if (node == p) r.removeRight();
+        });
     }
 
     @Override
     public Optional<E> removeFirst(final E value) {
+        requireNonNull(value, "The value to be removed cannot be null");
         if (root == null) return Optional.empty();
         Optional<Node<E>> nodeToRemove = findFirst(value);
         nodeToRemove.ifPresent(this::remove);
@@ -120,7 +141,7 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
     }
 
     void remove(final Node<E> node) {
-        Objects.requireNonNull(node, "Node cannot be null");
+        requireNonNull(node, "Node cannot be null");
         Optional<Node<E>> parent = node.getParent();
         if (!node.getLeft().isPresent() && !node.getRight().isPresent()) {
             // node is a leaf
@@ -132,14 +153,16 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
     }
 
     @Override
-    public Optional<Node<E>> findFirst(E value) {
+    public Optional<Node<E>> findFirst(final E value) {
+        requireNonNull(value, "The value to search for cannot be null");
         return Optional.empty();
     }
 
     @Override
     public Optional<E> getMax() {
         if (this.root == null) return Optional.empty();
-        return Optional.of(keepGoingWithDirection(this.root, Direction.RIGHT).getValue());    }
+        return Optional.of(keepGoingWithDirection(this.root, Direction.RIGHT).getValue());
+    }
 
     @Override
     public Optional<E> getMin() {
@@ -147,7 +170,9 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
         return Optional.of(keepGoingWithDirection(this.root, Direction.LEFT).getValue());
     }
 
-    private Node<E> keepGoingWithDirection(Node<E> start, Direction direction) {
+    private Node<E> keepGoingWithDirection(final Node<E> start, final Direction direction) {
+        requireNonNull(start, "The node to start the walk cannot be null");
+        requireNonNull(direction, "The direction cannot be null");
         Node<E> current = start;
         Optional<Node<E>> next = current.get(direction);
         while (next.isPresent()) {
@@ -179,11 +204,14 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
     }
 
     @Override
-    public Boolean contains(E value) {
-        return containsIn(this.root, value);
+    public Boolean contains(final E value) {
+        requireNonNull(value, "The value to search for cannot be null");
+        return (this.root == null) ? false : containsIn(this.root, value);
     }
 
-    private Boolean containsIn(Node<E> node, E value) {
+    private Boolean containsIn(final Node<E> node, final E value) {
+        requireNonNull(node, "The node cannot be null");
+        requireNonNull(value, "The value cannot be null");
         int comp = node.getValue().compareTo(value);
         if (comp == 0) {
             return true;
@@ -197,11 +225,14 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
     }
 
     @Override
-    public Integer occurrencesOf(E value) {
+    public Integer occurrencesOf(final E value) {
+        requireNonNull(value, "The value cannot be null");
         return (root == null) ? 0 : occurrencesOf(this.root, value);
     }
 
-    private Integer occurrencesOf(Node<E> node, E value) {
+    private Integer occurrencesOf(final Node<E> node, final E value) {
+        requireNonNull(node, "The node cannot be null");
+        requireNonNull(value, "The value cannot be null");
         Integer count = 0;
         if (node.getValue().compareTo(value) == 0) count += 1;
         if (node.getLeft().isPresent()) count += occurrencesOf(node.getLeft().get(), value);
@@ -211,10 +242,11 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
 
     @Override
     public Integer height() {
-        return heightOf(this.root);
+        return (this.root == null) ? 0 : heightOf(this.root);
     }
 
-    private Integer balanceOf(Node<E> node) {
+    private Integer balanceOf(final Node<E> node) {
+        requireNonNull(node, "The node cannot be null");
         Integer leftHeight = 0;
         Integer rightHeight = 0;
         if (node.getLeft().isPresent()) {
@@ -226,7 +258,8 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
         return leftHeight - rightHeight;
     }
 
-    private Integer heightOf(Node<E> node) {
+    private Integer heightOf(final Node<E> node) {
+        requireNonNull(node, "The node cannot be null");
         Integer leftHeight = 0;
         Integer rightHeight = 0;
         Optional<Node<E>> leftChild = node.getLeft();
@@ -252,6 +285,7 @@ public class AvlTree <E extends Comparable<E>> implements Tree<E>, Iterable<E> {
         return list;
     }
 
+    @NotNull
     @Override
     public Iterator<E> iterator() {
         return new TreeIterator(this.root);
