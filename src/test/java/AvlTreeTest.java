@@ -5,7 +5,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 
 class AvlTreeTest {
 
@@ -235,7 +240,7 @@ class AvlTreeTest {
         final AvlTree<Integer> tree = new AvlTree<>();
         tree.insertAll(List.of(4, 7, -2, 10, 13, 14, 15));
         final Iterator<Integer> it = tree.iterator();
-        Integer current = -2;
+        int current = -2;
         while (it.hasNext()) {
             Integer next = it.next();
             assertTrue(current <= next);
@@ -247,7 +252,7 @@ class AvlTreeTest {
     void iteratorFromEmptyTreeHasNoValues() {
         final AvlTree<Integer> tree = new AvlTree<>();
         final Iterator<Integer> it = tree.iterator();
-        while (it.hasNext()) fail();
+        if (it.hasNext()) fail();
     }
 
     @Test

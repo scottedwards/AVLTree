@@ -59,9 +59,8 @@ public class AvlTree<E extends Comparable<E>> implements Tree<E>, Iterable<E> {
 
     private void rotate(Node<E> node, Direction dir1, Direction dir2) throws ChildNotFoundException {
         final String errorMessage = "Child expected to be found but wasn't while rotating tree";
-        Node<E> pivot = node.get(dir1).orElseThrow(
-                () -> new ChildNotFoundException(errorMessage)
-        );
+        Node<E> pivot = node.get(dir1).orElseThrow(() -> new ChildNotFoundException(errorMessage));
+
         if (dir1 == Direction.RIGHT && dir2 == Direction.RIGHT) {
             leftRotation(node, pivot);
         } else if (dir1 == Direction.LEFT && dir2 == Direction.LEFT) {
@@ -201,22 +200,18 @@ public class AvlTree<E extends Comparable<E>> implements Tree<E>, Iterable<E> {
     @Override
     public Boolean contains(final E value) {
         requireNonNull(value, "The value to search for cannot be null");
-        return (this.root == null) ? false : containsIn(this.root, value);
+        return this.root != null && containsIn(this.root, value);
     }
 
     private Boolean containsIn(final Node<E> node, final E value) {
         requireNonNull(node, "The node cannot be null");
         requireNonNull(value, "The value cannot be null");
+
         int comp = node.getValue().compareTo(value);
-        if (comp == 0) {
-            return true;
-        } else {
-            Direction direction = (comp < 0) ? Direction.RIGHT : Direction.LEFT;
-            if (node.get(direction).isPresent()) {
-                return containsIn(node.get(direction).get(), value);
-            }
-        }
-        return false;
+        if (comp == 0) return true;
+
+        Direction direction = (comp < 0) ? Direction.RIGHT : Direction.LEFT;
+        return node.get(direction).isPresent() && containsIn(node.get(direction).get(), value);
     }
 
     @Override
@@ -228,10 +223,12 @@ public class AvlTree<E extends Comparable<E>> implements Tree<E>, Iterable<E> {
     private Integer occurrencesOf(final Node<E> node, final E value) {
         requireNonNull(node, "The node cannot be null");
         requireNonNull(value, "The value cannot be null");
+
         Integer count = 0;
         if (node.getValue().compareTo(value) == 0) count += 1;
         if (node.getLeft().isPresent()) count += occurrencesOf(node.getLeft().get(), value);
         if (node.getRight().isPresent()) count += occurrencesOf(node.getRight().get(), value);
+
         return count;
     }
 
@@ -242,30 +239,32 @@ public class AvlTree<E extends Comparable<E>> implements Tree<E>, Iterable<E> {
 
     private Integer balanceOf(final Node<E> node) {
         requireNonNull(node, "The node cannot be null");
-        Integer leftHeight = 0;
-        Integer rightHeight = 0;
-        if (node.getLeft().isPresent()) {
+
+        int leftHeight = 0;
+        int rightHeight = 0;
+
+        if (node.getLeft().isPresent())
             leftHeight = 1 + heightOf(node.getLeft().get());
-        }
-        if (node.getRight().isPresent()) {
+        if (node.getRight().isPresent())
             rightHeight = 1 + heightOf(node.getRight().get());
-        }
+
         return leftHeight - rightHeight;
     }
 
     private Integer heightOf(final Node<E> node) {
         requireNonNull(node, "The node cannot be null");
-        Integer leftHeight = 0;
-        Integer rightHeight = 0;
+
+        int leftHeight = 0;
+        int rightHeight = 0;
         Optional<Node<E>> leftChild = node.getLeft();
         Optional<Node<E>> rightChild = node.getRight();
-        if (leftChild.isPresent()) {
+
+        if (leftChild.isPresent())
             leftHeight = 1 + heightOf(leftChild.get());
-        }
-        if (rightChild.isPresent()) {
+        if (rightChild.isPresent())
             rightHeight = 1 + heightOf(rightChild.get());
-        }
-        return (leftHeight < rightHeight) ? rightHeight : leftHeight;
+
+        return Math.max(leftHeight, rightHeight);
     }
 
     @Override
@@ -288,7 +287,7 @@ public class AvlTree<E extends Comparable<E>> implements Tree<E>, Iterable<E> {
 
     private class TreeIterator implements Iterator<E> {
 
-        private Stack<Node<E>> searchStack;
+        private final Stack<Node<E>> searchStack;
         private Node<E> current;
 
         TreeIterator(Node<E> root) {
