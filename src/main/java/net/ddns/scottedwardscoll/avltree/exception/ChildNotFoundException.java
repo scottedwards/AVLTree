@@ -1,3 +1,5 @@
+package net.ddns.scottedwardscoll.avltree.exception;
+
 public class ChildNotFoundException extends Exception {
 
     public ChildNotFoundException() {

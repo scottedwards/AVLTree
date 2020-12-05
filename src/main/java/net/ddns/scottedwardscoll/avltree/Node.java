@@ -1,3 +1,5 @@
+package net.ddns.scottedwardscoll.avltree;
+
 import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;

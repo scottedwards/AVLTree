@@ -1,4 +1,6 @@
-import org.jetbrains.annotations.NotNull;
+package net.ddns.scottedwardscoll.avltree;
+
+import net.ddns.scottedwardscoll.avltree.exception.ChildNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -279,7 +281,6 @@ public class AvlTree<E extends Comparable<E>> implements Tree<E>, Iterable<E> {
         return list;
     }
 
-    @NotNull
     @Override
     public Iterator<E> iterator() {
         return new TreeIterator(this.root);
